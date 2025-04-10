@@ -7,13 +7,53 @@
     android:layout_height="match_parent"
     tools:context=".MainActivity">
 
-    <TextView
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:text="Hello World!"
-        app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintEnd_toEndOf="parent"
-        app:layout_constraintStart_toStartOf="parent"
-        app:layout_constraintTop_toTopOf="parent" />
+    <fragment
+        android:layout_width="match_parent"
+        android:layout_height="0dp"
+        android:id="@+id/main_frame"
+        app:layout_constraintLeft_toLeftOf="parent"
+        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintTop_toTopOf="parent"
+        app:layout_constraintBottom_toTopOf="@id/bottom_nav_bar"
+        app:defaultNavHost="true"
+        android:name="androidx.navigation.fragment.NavHostFragment"
+        app:navGraph="@navigation/nav_graph"
+        />
+
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="50dp"
+        android:id="@+id/bottom_nav_bar"
+        android:orientation="horizontal"
+        android:background="#c7f1ca"
+        app:layout_constraintTop_toBottomOf="@id/main_frame">
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/nav_games"
+            android:textColor="#38220f"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:text="Games" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/nav_leaderboard"
+            android:textColor="#38220f"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:text="Leaderboard" />
+        <TextView
+            android:layout_width="0dp"
+            android:layout_height="match_parent"
+            android:layout_weight="1"
+            android:id="@+id/nav_profile"
+            android:textColor="#38220f"
+            android:textSize="20sp"
+            android:gravity="center"
+            android:text="Profile" />
+    </LinearLayout>
 
 </androidx.constraintlayout.widget.ConstraintLayout>
