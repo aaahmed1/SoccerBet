@@ -1,0 +1,29 @@
+{
+  "project_info": {
+    "project_number": "555893716257",
+    "project_id": "soccerbet-88a48",
+    "storage_bucket": "soccerbet-88a48.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:555893716257:android:eeb070a2bdcfc69fc9ba60",
+        "android_client_info": {
+          "package_name": "com.example.soccerbetapp"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyBGsEoq6PmZjjOAuQ-y6D17lk-qs8F-Exw"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

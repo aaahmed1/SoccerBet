@@ -8,11 +8,11 @@
     tools:context=".MainActivity">
 
     <fragment
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="0dp"
         android:id="@+id/main_frame"
-        app:layout_constraintLeft_toLeftOf="parent"
-        app:layout_constraintRight_toRightOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintBottom_toTopOf="@id/bottom_nav_bar"
         app:defaultNavHost="true"
@@ -21,18 +21,21 @@
         />
 
     <LinearLayout
-        android:layout_width="match_parent"
+        android:layout_width="0dp"
         android:layout_height="50dp"
         android:id="@+id/bottom_nav_bar"
         android:orientation="horizontal"
-        android:background="#c7f1ca"
-        app:layout_constraintTop_toBottomOf="@id/main_frame">
+        android:background="@color/green1"
+        app:layout_constraintTop_toBottomOf="@id/main_frame"
+        app:layout_constraintBottom_toBottomOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintEnd_toEndOf="parent">
         <TextView
             android:layout_width="0dp"
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:id="@+id/nav_games"
-            android:textColor="#38220f"
+            android:textColor="@color/brown1"
             android:textSize="20sp"
             android:gravity="center"
             android:text="Games" />
@@ -41,7 +44,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:id="@+id/nav_leaderboard"
-            android:textColor="#38220f"
+            android:textColor="@color/brown1"
             android:textSize="20sp"
             android:gravity="center"
             android:text="Leaderboard" />
@@ -50,7 +53,7 @@
             android:layout_height="match_parent"
             android:layout_weight="1"
             android:id="@+id/nav_profile"
-            android:textColor="#38220f"
+            android:textColor="@color/brown1"
             android:textSize="20sp"
             android:gravity="center"
             android:text="Profile" />
