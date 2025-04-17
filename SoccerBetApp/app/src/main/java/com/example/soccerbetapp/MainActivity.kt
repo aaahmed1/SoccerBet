@@ -26,6 +26,9 @@ class MainActivity : AppCompatActivity() {
             insets
         }
         navController = findNavController(R.id.main_frame)
+        binding.navGames.setOnClickListener {
+            navController.navigate(R.id.gamesFragment)
+        }
     }
 
     override fun onStart() {

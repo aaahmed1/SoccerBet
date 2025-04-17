@@ -1,0 +1,41 @@
+package com.example.soccerbetapp.ui
+
+import android.view.LayoutInflater
+import android.view.ViewGroup
+import androidx.recyclerview.widget.DiffUtil
+import androidx.recyclerview.widget.ListAdapter
+import androidx.recyclerview.widget.RecyclerView
+import com.example.soccerbetapp.MainViewModel
+import com.example.soccerbetapp.api.GameData
+import com.example.soccerbetapp.databinding.RowGamesBinding
+
+class GamesRowAdapter(private val viewModel: MainViewModel)
+    : ListAdapter<GameData, GamesRowAdapter.VH>(GameDiff()) {
+
+        inner class VH(val rowGamesBinding: RowGamesBinding): RecyclerView.ViewHolder(rowGamesBinding.root) {
+
+        }
+
+    override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {
+        val rowGamesBinding = RowGamesBinding.inflate(LayoutInflater.from(parent.context), parent, false)
+        return VH(rowGamesBinding)
+    }
+
+    override fun onBindViewHolder(holder: VH, position: Int) {
+        val game = getItem(position)
+        val binding = holder.rowGamesBinding
+        binding.homeTeam.text = game.teams.home.name
+        binding.awayTeam.text = game.teams.away.name
+    }
+
+    class GameDiff : DiffUtil.ItemCallback<GameData>() {
+        override fun areItemsTheSame(oldItem: GameData, newItem: GameData): Boolean {
+            return oldItem.fixture.id == newItem.fixture.id
+        }
+
+        override fun areContentsTheSame(oldItem: GameData, newItem: GameData): Boolean {
+            return oldItem.teams.home.name == newItem.teams.home.name &&
+                    oldItem.teams.away.name == newItem.teams.away.name
+        }
+    }
+}
