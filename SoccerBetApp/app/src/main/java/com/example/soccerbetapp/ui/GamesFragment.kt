@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.soccerbetapp.MainViewModel
@@ -17,7 +18,7 @@ class GamesFragment: Fragment(R.layout.fragment_games) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentGamesBinding.bind(view)
         val rv = binding.recyclerView
-        val gamesRowAdapter = GamesRowAdapter(viewModel)
+        val gamesRowAdapter = GamesRowAdapter(viewModel, findNavController())
         rv.adapter = gamesRowAdapter
         rv.layoutManager = LinearLayoutManager(activity)
         viewModel.observeNextGames().observe(viewLifecycleOwner) {

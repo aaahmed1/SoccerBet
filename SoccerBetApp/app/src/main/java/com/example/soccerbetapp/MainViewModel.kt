@@ -17,6 +17,7 @@ class MainViewModel: ViewModel() {
     private val api = SoccerApi.create()
     private val repo = GameRepository(api)
     private var nextGames = MutableLiveData<List<GameData>>()
+    lateinit var curGame: GameData
 
     fun fetchNextGames() {
         viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {

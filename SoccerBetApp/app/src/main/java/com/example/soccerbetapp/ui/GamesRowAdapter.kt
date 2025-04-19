@@ -2,18 +2,25 @@ package com.example.soccerbetapp.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.navigation.NavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
 import androidx.recyclerview.widget.RecyclerView
 import com.example.soccerbetapp.MainViewModel
+import com.example.soccerbetapp.R
 import com.example.soccerbetapp.api.GameData
 import com.example.soccerbetapp.databinding.RowGamesBinding
 
-class GamesRowAdapter(private val viewModel: MainViewModel)
+class GamesRowAdapter(private val viewModel: MainViewModel, private val navController: NavController)
     : ListAdapter<GameData, GamesRowAdapter.VH>(GameDiff()) {
 
         inner class VH(val rowGamesBinding: RowGamesBinding): RecyclerView.ViewHolder(rowGamesBinding.root) {
-
+            init {
+                rowGamesBinding.root.setOnClickListener {
+                    viewModel.curGame = viewModel.observeNextGames().value!![bindingAdapterPosition]
+                    navController.navigate(R.id.matchFragment)
+                }
+            }
         }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): VH {

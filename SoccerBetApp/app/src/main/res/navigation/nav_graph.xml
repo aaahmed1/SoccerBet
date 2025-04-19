@@ -17,4 +17,8 @@
         android:id="@+id/gamesFragment"
         android:name="com.example.soccerbetapp.ui.GamesFragment"
         android:label="Games"/>
+    <fragment
+        android:id="@+id/matchFragment"
+        android:name="com.example.soccerbetapp.ui.MatchFragment"
+        android:label="Match"/>
 </navigation>

@@ -15,7 +15,7 @@ interface SoccerApi {
     @GET("/fixtures?league=39&season=2024&next=5")
     suspend fun getNextGamesTest(): Response<ResponseBody>
 
-    @GET("/fixtures?league=39&season=2024&next=5")
+    @GET("/fixtures?league=39&season=2024&next=10")
     suspend fun getNextGames(): GameResponse
 
     companion object {
