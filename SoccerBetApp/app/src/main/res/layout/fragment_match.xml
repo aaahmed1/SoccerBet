@@ -145,6 +145,24 @@
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:padding="5dp"
-        android:id="@+id/totalPoints"
-        android:text="Total points bet on this game: 0"/>
+        android:id="@+id/totalPointsHome"
+        android:text="Total points bet on home: 0"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:id="@+id/totalPointsDraw"
+        android:text="Total points bet on draw: 0"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:padding="5dp"
+        android:id="@+id/totalPointsAway"
+        android:text="Total points bet on away: 0"/>
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/reloadBut"
+        android:text="Refresh Game"
+        android:layout_margin="5dp"/>
 </LinearLayout>

@@ -17,7 +17,9 @@ class GamesRowAdapter(private val viewModel: MainViewModel, private val navContr
         inner class VH(val rowGamesBinding: RowGamesBinding): RecyclerView.ViewHolder(rowGamesBinding.root) {
             init {
                 rowGamesBinding.root.setOnClickListener {
-                    viewModel.curGame = viewModel.observeNextGames().value!![bindingAdapterPosition]
+                    val game = viewModel.observeNextGames().value!![bindingAdapterPosition]
+                    viewModel.setCurGame(game)
+                    viewModel.updateCurBet(game.fixture.id)
                     navController.navigate(R.id.matchFragment)
                 }
             }

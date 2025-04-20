@@ -17,6 +17,9 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
         binding.logoutBut.setOnClickListener {
             viewModel.authUser.logout()
         }
+        viewModel.observeDBUser().observe(viewLifecycleOwner) {
+            binding.totalPoints.text = "Total points: ${it?.total.toString()}"
+        }
         binding.displayName.text = viewModel.currentUser.name
         binding.email.text = viewModel.currentUser.email
     }

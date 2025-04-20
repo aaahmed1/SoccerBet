@@ -1,6 +1,8 @@
 package com.example.soccerbetapp
 
 import android.os.Bundle
+import android.util.Log
+import android.view.View
 import androidx.activity.enableEdgeToEdge
 import androidx.activity.viewModels
 import androidx.appcompat.app.AppCompatActivity
@@ -27,18 +29,39 @@ class MainActivity : AppCompatActivity() {
         }
         navController = findNavController(R.id.main_frame)
         binding.navGames.setOnClickListener {
+            showNavBar()
             navController.navigate(R.id.gamesFragment)
+        }
+        binding.navProfile.setOnClickListener {
+            showNavBar()
+            navController.navigate(R.id.profileFragment)
         }
     }
 
     override fun onStart() {
         super.onStart()
+        //Log.d("dbTEST", viewModel.)
         viewModel.authUser = AuthUser(activityResultRegistry)
         lifecycle.addObserver(viewModel.authUser)
         viewModel.authUser.observeUser().observe(this) {
             viewModel.currentUser = it
-            if (viewModel.currentUser.isInvalid()) navController.navigate(R.id.signInFragment)
-            else navController.navigate(R.id.profileFragment)
+            if (viewModel.currentUser.isInvalid()) {
+                hideNavBar()
+                navController.navigate(R.id.signInFragment)
+            }
+            else {
+                showNavBar()
+                viewModel.updateDBUser()
+                navController.navigate(R.id.profileFragment)
+            }
         }
+    }
+
+    private fun hideNavBar() {
+        binding.bottomNavBar.visibility = View.GONE
+    }
+
+    private fun showNavBar() {
+        binding.bottomNavBar.visibility = View.VISIBLE
     }
 }
