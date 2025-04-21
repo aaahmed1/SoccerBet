@@ -30,10 +30,12 @@ class MainActivity : AppCompatActivity() {
         navController = findNavController(R.id.main_frame)
         binding.navGames.setOnClickListener {
             showNavBar()
+            viewModel.removeBetListener()
             navController.navigate(R.id.gamesFragment)
         }
         binding.navProfile.setOnClickListener {
             showNavBar()
+            viewModel.removeBetListener()
             navController.navigate(R.id.profileFragment)
         }
     }

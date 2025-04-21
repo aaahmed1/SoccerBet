@@ -15,6 +15,7 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentProfileBinding.bind(view)
         binding.logoutBut.setOnClickListener {
+            viewModel.removeUserListener()
             viewModel.authUser.logout()
         }
         viewModel.observeDBUser().observe(viewLifecycleOwner) {

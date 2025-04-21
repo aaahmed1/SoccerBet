@@ -9,6 +9,7 @@ import com.example.soccerbetapp.api.GameRepository
 import com.example.soccerbetapp.api.SoccerApi
 import com.example.soccerbetapp.model.Bet
 import com.example.soccerbetapp.model.DBUser
+import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
 
@@ -21,8 +22,16 @@ class MainViewModel: ViewModel() {
     private var nextGames = MutableLiveData<List<GameData>>()
     private var curGame = MutableLiveData<GameData>()
     private var dbUser = MutableLiveData<DBUser>()
-    private val dbHelper = DBHelper()
+    private var userListener: ListenerRegistration? = null
+    private var betListener: ListenerRegistration? = null
+    private val dbHelper = DBHelper(userListener, betListener)
     private var curBet = MutableLiveData<Bet>()
+
+    override fun onCleared() {
+        super.onCleared()
+        userListener?.remove()
+        betListener?.remove()
+    }
 
     fun fetchNextGames() {
         viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
@@ -61,5 +70,17 @@ class MainViewModel: ViewModel() {
 
     fun updateCurBet(fixture: Int) {
         dbHelper.getBet(fixture, curBet)
+    }
+
+    fun makeUserBet(points: Int, result: Int) {
+        dbHelper.makeUserBet(points, result, currentUser.uid, curGame.value!!.fixture.id)
+    }
+
+    fun removeBetListener() {
+        betListener?.remove()
+    }
+
+    fun removeUserListener() {
+        userListener?.remove()
     }
 }

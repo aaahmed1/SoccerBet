@@ -1,6 +1,7 @@
 package com.example.soccerbetapp.ui
 
 import android.os.Bundle
+import android.util.Log
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
@@ -30,8 +31,47 @@ class MatchFragment: Fragment(R.layout.fragment_match) {
         }
         viewModel.observeCurBet().observe(viewLifecycleOwner) {
             binding.totalPointsHome.text = "Total points bet on home: ${it.homePoints}"
-            binding.totalPointsDraw.text = "Total points bet on home: ${it.drawPoints}"
-            binding.totalPointsAway.text = "Total points bet on home: ${it.awayPoints}"
+            binding.totalPointsDraw.text = "Total points bet on draw: ${it.drawPoints}"
+            binding.totalPointsAway.text = "Total points bet on away: ${it.awayPoints}"
+        }
+        binding.winHomeButton.setOnClickListener {
+            val user = viewModel.observeDBUser().value!!
+            val game = viewModel.observeCurGame().value!!
+            val madeBet = user.bets.contains(game.fixture.id)
+            val input = binding.winHomeBet.text
+            val points = input.toString().toIntOrNull()
+            if (!madeBet && !input.isNullOrEmpty() && points != null && points <= user.total) {
+                binding.winHomeBet.text.clear()
+                viewModel.makeUserBet(points, 0)
+            }
+        }
+        binding.drawButton.setOnClickListener {
+            val user = viewModel.observeDBUser().value!!
+            val game = viewModel.observeCurGame().value!!
+            val madeBet = user.bets.contains(game.fixture.id)
+            val input = binding.drawBet.text
+            //Log.d("matchFrag", input.toString())
+            val points = input.toString().toIntOrNull()
+            //Log.d("matchFrag", (!madeBet).toString())
+            //Log.d("matchFrag", input.isNullOrEmpty().toString())
+            //Log.d("matchFrag", (points != null).toString())
+            //Log.d("matchFrag", (points!! <= user.total).toString())
+            if (!madeBet && !input.isNullOrEmpty() && points != null && points <= user.total) {
+                Log.d("matchFrag", "hello")
+                binding.winHomeBet.text.clear()
+                viewModel.makeUserBet(points, 1)
+            }
+        }
+        binding.winAwayButton.setOnClickListener {
+            val user = viewModel.observeDBUser().value!!
+            val game = viewModel.observeCurGame().value!!
+            val madeBet = user.bets.contains(game.fixture.id)
+            val input = binding.winAwayBet.text
+            val points = input.toString().toIntOrNull()
+            if (!madeBet && !input.isNullOrEmpty() && points != null && points <= user.total) {
+                binding.winHomeBet.text.clear()
+                viewModel.makeUserBet(points, 2)
+            }
         }
     }
 }
