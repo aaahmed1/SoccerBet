@@ -10,9 +10,11 @@ import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.MetadataChanges
+import com.google.firebase.firestore.Query
 import com.google.firebase.firestore.firestore
 
-class DBHelper(private var userListener: ListenerRegistration?, private var betListener: ListenerRegistration?) {
+class DBHelper(private var userListener: ListenerRegistration?, private var betListener: ListenerRegistration?,
+               private var usersListener: ListenerRegistration?) {
     private val db = FirebaseFirestore.getInstance()
     private val TAG = "DBError"
 
@@ -140,6 +142,99 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
                     Log.d(TAG, "Bet local change")
                 }
             }
+        }
+    }
+
+    fun awardBet(fixture: Int) {
+        val userBetsRef = db.collection("userbets")
+        val userBetsQuery = userBetsRef.whereEqualTo("fixture", fixture)
+        userBetsQuery.get()
+            .addOnSuccessListener{documents ->
+                db.runTransaction{transaction ->
+                    val betRef = db.collection("bets").document(fixture.toString())
+                    val betDoc = transaction.get(betRef)
+
+                    val betObj = betDoc.toObject(Bet::class.java)!!
+                    val total = betObj.homePoints + betObj.drawPoints + betObj.awayPoints
+                    var mod1 = 1.0
+                    var mod2 = 1.0
+                    var mod3 = 1.0
+                    if (betObj.homePoints > 0) mod1 = total.toDouble() / betObj.homePoints
+                    if (betObj.drawPoints > 0) mod2 = total.toDouble() / betObj.drawPoints
+                    if (betObj.awayPoints > 0) mod3 = total.toDouble() / betObj.awayPoints
+
+                    for (document in documents) {
+                        val userBetObj = document.toObject(UserBet::class.java)
+                        val userRef = db.collection("users").document(userBetObj.uid)
+
+                        val userDoc = transaction.get(userRef)
+                        val userPoints = userBetObj.points
+                        val homeResult: Long = (userPoints.toDouble() * mod1).toLong()
+                        val drawResult: Long = (userPoints.toDouble() * mod2).toLong()
+                        val awayResult: Long = (userPoints.toDouble() * mod3).toLong()
+                        val bet = userBetObj.result
+
+                        if (bet == 0) transaction.update(userRef, "total", FieldValue.increment(homeResult))
+                        else if (bet == 1) transaction.update(userRef, "total", FieldValue.increment(drawResult))
+                        else if (bet == 2) transaction.update(userRef, "total", FieldValue.increment(awayResult))
+                    }
+                    transaction.update(betRef, "finished", true)
+                }
+                    .addOnSuccessListener{result ->
+                        Log.d(TAG, "Transaction success: $result")
+                    }
+                    .addOnFailureListener{exception ->
+                        Log.d(TAG, "Transaction failure, ", exception)
+                    }
+            }
+            .addOnFailureListener{exception ->
+                Log.d(TAG, "award query failed, ", exception)
+            }
+    }
+
+    fun getUsers(users: MutableLiveData<List<DBUser>>) {
+        val leaders = mutableListOf<DBUser>()
+        val usersRef = db.collection("users")
+        usersRef.orderBy("total", Query.Direction.DESCENDING).get()
+            .addOnSuccessListener{result ->
+                for (document in result) {
+                    val user = document.toObject(DBUser::class.java)
+                    leaders.add(user)
+                }
+                Log.d(TAG, "users size: ${leaders.size}")
+                users.postValue(leaders.toList())
+                addUsersListener(users)
+            }
+            .addOnFailureListener {exception ->
+                Log.d(TAG, "users query failed, ", exception)
+            }
+    }
+
+    fun addUsersListener(users: MutableLiveData<List<DBUser>>) {
+        val usersRef = db.collection("users")
+        usersListener = usersRef.orderBy("total", Query.Direction.DESCENDING)
+            .addSnapshotListener(MetadataChanges.INCLUDE){ snapshot, e ->
+                if (e != null) {
+                    Log.w(TAG, "Bet Listen failed.", e)
+                    return@addSnapshotListener
+                }
+
+                if (snapshot != null) {
+                    val hasPendingWrites = snapshot.metadata.hasPendingWrites()
+                    if (!hasPendingWrites) {
+                        val leaders = mutableListOf<DBUser>()
+                        for (document in snapshot) {
+                            val user = document.toObject(DBUser::class.java)
+                            leaders.add(user)
+                        }
+                        Log.d(TAG, "snapshot size (listen): ${snapshot.size()}")
+                        Log.d(TAG, "leaders size (listen): ${leaders.size}")
+                        users.postValue(leaders.toList())
+                    }
+                    else {
+                        Log.d(TAG, "Users local change")
+                    }
+                }
         }
     }
 }

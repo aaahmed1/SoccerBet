@@ -2,6 +2,7 @@ package com.example.soccerbetapp.ui
 
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.lifecycle.LiveData
 import androidx.navigation.NavController
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.ListAdapter
@@ -11,13 +12,15 @@ import com.example.soccerbetapp.R
 import com.example.soccerbetapp.api.GameData
 import com.example.soccerbetapp.databinding.RowGamesBinding
 
-class GamesRowAdapter(private val viewModel: MainViewModel, private val navController: NavController)
+class GamesRowAdapter(private val viewModel: MainViewModel, private val navController: NavController, private val select: Int)
     : ListAdapter<GameData, GamesRowAdapter.VH>(GameDiff()) {
 
         inner class VH(val rowGamesBinding: RowGamesBinding): RecyclerView.ViewHolder(rowGamesBinding.root) {
             init {
                 rowGamesBinding.root.setOnClickListener {
-                    val game = viewModel.observeNextGames().value!![bindingAdapterPosition]
+                    var games = viewModel.observeNextGames()
+                    if (select == 1) games = viewModel.observeMyGames()
+                    val game = games.value!![bindingAdapterPosition]
                     viewModel.setCurGame(game)
                     viewModel.updateCurBet(game.fixture.id)
                     navController.navigate(R.id.matchFragment)

@@ -24,13 +24,17 @@ class MainViewModel: ViewModel() {
     private var dbUser = MutableLiveData<DBUser>()
     private var userListener: ListenerRegistration? = null
     private var betListener: ListenerRegistration? = null
-    private val dbHelper = DBHelper(userListener, betListener)
+    private var usersListener: ListenerRegistration? = null
+    private val dbHelper = DBHelper(userListener, betListener, usersListener)
     private var curBet = MutableLiveData<Bet>()
+    private var myGames = MutableLiveData<List<GameData>>()
+    private var users = MutableLiveData<List<DBUser>>()
 
     override fun onCleared() {
         super.onCleared()
         userListener?.remove()
         betListener?.remove()
+        usersListener?.remove()
     }
 
     fun fetchNextGames() {
@@ -38,6 +42,20 @@ class MainViewModel: ViewModel() {
             nextGames.postValue(repo.getNextGames())
             //repo.getNextGamesTest()
         }
+    }
+
+    fun fetchMyGames() {
+        viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            val myList = mutableListOf<GameData>()
+            for (fixture in dbUser.value!!.bets) {
+                myList.add(repo.getOneGame(fixture))
+            }
+            myGames.postValue(myList.toList())
+        }
+    }
+
+    fun observeMyGames(): LiveData<List<GameData>> {
+        return myGames
     }
 
     fun observeNextGames(): LiveData<List<GameData>> {
@@ -82,5 +100,17 @@ class MainViewModel: ViewModel() {
 
     fun removeUserListener() {
         userListener?.remove()
+    }
+
+    fun removeUsersListener() {
+        usersListener?.remove()
+    }
+
+    fun observeUsers(): LiveData<List<DBUser>> {
+        return users
+    }
+
+    fun updateUsers() {
+        dbHelper.getUsers(users)
     }
 }

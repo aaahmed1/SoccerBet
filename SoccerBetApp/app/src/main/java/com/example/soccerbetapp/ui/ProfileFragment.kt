@@ -4,6 +4,7 @@ import android.os.Bundle
 import android.view.View
 import androidx.fragment.app.Fragment
 import androidx.fragment.app.activityViewModels
+import androidx.navigation.fragment.findNavController
 import com.example.soccerbetapp.MainViewModel
 import com.example.soccerbetapp.R
 import com.example.soccerbetapp.databinding.FragmentProfileBinding
@@ -17,6 +18,9 @@ class ProfileFragment: Fragment(R.layout.fragment_profile) {
         binding.logoutBut.setOnClickListener {
             viewModel.removeUserListener()
             viewModel.authUser.logout()
+        }
+        binding.betsBut.setOnClickListener {
+            findNavController().navigate(R.id.myGamesFragment)
         }
         viewModel.observeDBUser().observe(viewLifecycleOwner) {
             binding.totalPoints.text = "Total points: ${it?.total.toString()}"

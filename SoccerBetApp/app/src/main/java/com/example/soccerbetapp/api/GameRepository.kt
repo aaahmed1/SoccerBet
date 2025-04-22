@@ -9,6 +9,11 @@ class GameRepository(private val soccerApi: SoccerApi) {
         return response.response
     }
 
+    suspend fun getOneGame(id: Int): GameData {
+        val response = soccerApi.getOneGame(id)
+        return response.response[0]
+    }
+
     suspend fun getNextGamesTest() {
         val response = soccerApi.getNextGamesTest()
         if (response.isSuccessful) {

@@ -69,4 +69,6 @@ dependencies {
     implementation("androidx.fragment:fragment-ktx:1.8.6")
 
     implementation("com.github.bumptech.glide:glide:4.16.0")
+
+    implementation("org.jetbrains.kotlinx:kotlinx-datetime:0.6.2")
 }

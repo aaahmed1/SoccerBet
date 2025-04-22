@@ -11,23 +11,23 @@ import com.example.soccerbetapp.MainViewModel
 import com.example.soccerbetapp.R
 import com.example.soccerbetapp.databinding.FragmentGamesBinding
 
-class GamesFragment: Fragment(R.layout.fragment_games) {
+class MyGamesFragment: Fragment(R.layout.fragment_games) {
     private val viewModel: MainViewModel by activityViewModels()
 
     override fun onViewCreated(view: View, savedInstanceState: Bundle?) {
         super.onViewCreated(view, savedInstanceState)
         val binding = FragmentGamesBinding.bind(view)
         val rv = binding.recyclerView
-        val gamesRowAdapter = GamesRowAdapter(viewModel, findNavController(), 0)
+        val gamesRowAdapter = GamesRowAdapter(viewModel, findNavController(), 1)
         rv.adapter = gamesRowAdapter
         rv.layoutManager = LinearLayoutManager(activity)
-        viewModel.observeNextGames().observe(viewLifecycleOwner) {
+        viewModel.observeMyGames().observe(viewLifecycleOwner) {
             gamesRowAdapter.submitList(it)
         }
         val dividerItemDecoration = DividerItemDecoration(
             rv.context, LinearLayoutManager.VERTICAL
         )
         rv.addItemDecoration(dividerItemDecoration)
-        viewModel.fetchNextGames()
+        viewModel.fetchMyGames()
     }
 }

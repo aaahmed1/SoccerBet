@@ -21,4 +21,12 @@
         android:id="@+id/matchFragment"
         android:name="com.example.soccerbetapp.ui.MatchFragment"
         android:label="Match"/>
+    <fragment
+        android:id="@+id/myGamesFragment"
+        android:name="com.example.soccerbetapp.ui.MyGamesFragment"
+        android:label="My Games"/>
+    <fragment
+        android:id="@+id/leaderFragment"
+        android:name="com.example.soccerbetapp.ui.LeaderFragment"
+        android:label="Leaderboard"/>
 </navigation>

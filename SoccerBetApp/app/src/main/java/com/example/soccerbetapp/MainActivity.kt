@@ -31,12 +31,18 @@ class MainActivity : AppCompatActivity() {
         binding.navGames.setOnClickListener {
             showNavBar()
             viewModel.removeBetListener()
+            viewModel.removeUsersListener()
             navController.navigate(R.id.gamesFragment)
         }
         binding.navProfile.setOnClickListener {
             showNavBar()
             viewModel.removeBetListener()
+            viewModel.removeUsersListener()
             navController.navigate(R.id.profileFragment)
+        }
+        binding.navLeaderboard.setOnClickListener {
+            viewModel.removeBetListener()
+            navController.navigate(R.id.leaderFragment)
         }
     }
 
