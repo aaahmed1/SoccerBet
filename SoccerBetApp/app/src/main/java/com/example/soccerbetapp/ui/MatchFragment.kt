@@ -9,6 +9,7 @@ import com.bumptech.glide.Glide
 import com.example.soccerbetapp.MainViewModel
 import com.example.soccerbetapp.R
 import com.example.soccerbetapp.databinding.FragmentMatchBinding
+import com.google.android.material.snackbar.Snackbar
 import kotlinx.datetime.LocalDateTime
 import kotlinx.datetime.format.DateTimeComponents
 
@@ -35,6 +36,12 @@ class MatchFragment: Fragment(R.layout.fragment_match) {
             val homeGoals = it.goals.home ?: 0
             val awayGoals = it.goals.away ?: 0
             binding.matchScore.text = "${homeGoals} - ${awayGoals}"
+            val curBet = viewModel.observeCurBet().value
+            Log.d("curBet", viewModel.observeCurBet().value.toString())
+            if (it.fixture.status.short == "FT" && curBet != null && !curBet.finished) {
+                Log.d("awardPoints", "Time to award points")
+                viewModel.awardBet(it.fixture.id)
+            }
         }
         viewModel.observeDBUser().observe(viewLifecycleOwner) {
             binding.yourPoints.text = "Points remaining: ${it.total}"
@@ -64,6 +71,9 @@ class MatchFragment: Fragment(R.layout.fragment_match) {
                 binding.winHomeBet.text.clear()
                 viewModel.makeUserBet(points, 0)
             }
+            else {
+                Snackbar.make(it, "Can't make bet", Snackbar.LENGTH_SHORT).setAnchorView(R.id.bottom_nav_bar).show()
+            }
         }
         binding.drawButton.setOnClickListener {
             val user = viewModel.observeDBUser().value!!
@@ -76,6 +86,9 @@ class MatchFragment: Fragment(R.layout.fragment_match) {
                 binding.drawBet.text.clear()
                 viewModel.makeUserBet(points, 1)
             }
+            else {
+                Snackbar.make(it, "Can't make bet", Snackbar.LENGTH_SHORT).setAnchorView(R.id.bottom_nav_bar).show()
+            }
         }
         binding.winAwayButton.setOnClickListener {
             val user = viewModel.observeDBUser().value!!
@@ -86,6 +99,20 @@ class MatchFragment: Fragment(R.layout.fragment_match) {
             if (!madeBet && !input.isNullOrEmpty() && points != null && points <= user.total) {
                 binding.winAwayBet.text.clear()
                 viewModel.makeUserBet(points, 2)
+            }
+            else {
+                Snackbar.make(it, "Can't make bet", Snackbar.LENGTH_SHORT).setAnchorView(R.id.bottom_nav_bar).show()
+            }
+        }
+        binding.reloadBut.setOnClickListener {
+            viewModel.fetchCurGame()
+        }
+        viewModel.observeUserBet().observe(viewLifecycleOwner) {
+            val result = it.result
+            when (result) {
+                0 -> binding.yourBet.text = "You bet ${it.points} points on the home team"
+                1 -> binding.yourBet.text = "You bet ${it.points} points on a draw"
+                else -> binding.yourBet.text = "You bet ${it.points} points on the away team"
             }
         }
     }

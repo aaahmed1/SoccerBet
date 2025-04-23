@@ -8,6 +8,7 @@ import com.example.soccerbetapp.model.UserBet
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.FirebaseFirestoreException
 import com.google.firebase.firestore.ListenerRegistration
 import com.google.firebase.firestore.MetadataChanges
 import com.google.firebase.firestore.Query
@@ -83,7 +84,7 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
             }
     }
 
-    fun makeUserBet(points: Int, result: Int, uid: String, fixture: Int) {
+    fun makeUserBet(points: Int, result: Int, uid: String, fixture: Int, curUserBet: MutableLiveData<UserBet>) {
         val userBet = UserBet(fixture, uid, points, result)
         val newUserBet = db.collection("userbets").document()
         val doc1 = db.collection("bets").document(fixture.toString())
@@ -99,6 +100,7 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
         }
         .addOnSuccessListener {
             Log.d(TAG, "Batch write success")
+            curUserBet.postValue(userBet)
         }
         .addOnFailureListener {
             Log.d(TAG, "Batch write failure")
@@ -155,6 +157,9 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
                     val betDoc = transaction.get(betRef)
 
                     val betObj = betDoc.toObject(Bet::class.java)!!
+                    if (betObj.finished) {
+                        throw FirebaseFirestoreException("Points already rewarded", FirebaseFirestoreException.Code.ABORTED)
+                    }
                     val total = betObj.homePoints + betObj.drawPoints + betObj.awayPoints
                     var mod1 = 1.0
                     var mod2 = 1.0
@@ -236,5 +241,22 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
                     }
                 }
         }
+    }
+
+    fun getUserBet(fixture: Int, uid: String, userBet: MutableLiveData<UserBet>) {
+        val userBetsRef = db.collection("userbets")
+        userBetsRef.whereEqualTo("fixture", fixture).whereEqualTo("uid", uid).get()
+            .addOnSuccessListener {result ->
+                if (!result.isEmpty) {
+                    userBet.postValue(result.documents[0].toObject(UserBet::class.java))
+                    Log.d(TAG, "Found userbet")
+                }
+                else {
+                    Log.d(TAG, "No userbet")
+                }
+            }
+            .addOnFailureListener {exception ->
+                Log.d(TAG, "userbet query failed, ", exception)
+            }
     }
 }

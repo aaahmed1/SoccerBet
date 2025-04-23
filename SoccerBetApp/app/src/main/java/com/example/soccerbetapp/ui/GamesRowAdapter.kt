@@ -1,5 +1,6 @@
 package com.example.soccerbetapp.ui
 
+import android.util.Log
 import android.view.LayoutInflater
 import android.view.ViewGroup
 import androidx.lifecycle.LiveData
@@ -23,6 +24,7 @@ class GamesRowAdapter(private val viewModel: MainViewModel, private val navContr
                     val game = games.value!![bindingAdapterPosition]
                     viewModel.setCurGame(game)
                     viewModel.updateCurBet(game.fixture.id)
+                    viewModel.updateUserBet(game.fixture.id)
                     navController.navigate(R.id.matchFragment)
                 }
             }

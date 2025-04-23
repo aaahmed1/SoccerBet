@@ -9,6 +9,7 @@ import com.example.soccerbetapp.api.GameRepository
 import com.example.soccerbetapp.api.SoccerApi
 import com.example.soccerbetapp.model.Bet
 import com.example.soccerbetapp.model.DBUser
+import com.example.soccerbetapp.model.UserBet
 import com.google.firebase.firestore.ListenerRegistration
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.launch
@@ -29,6 +30,7 @@ class MainViewModel: ViewModel() {
     private var curBet = MutableLiveData<Bet>()
     private var myGames = MutableLiveData<List<GameData>>()
     private var users = MutableLiveData<List<DBUser>>()
+    private var curUserBet = MutableLiveData<UserBet>()
 
     override fun onCleared() {
         super.onCleared()
@@ -51,6 +53,12 @@ class MainViewModel: ViewModel() {
                 myList.add(repo.getOneGame(fixture))
             }
             myGames.postValue(myList.toList())
+        }
+    }
+
+    fun fetchCurGame() {
+        viewModelScope.launch(context = viewModelScope.coroutineContext + Dispatchers.IO) {
+            curGame.postValue(repo.getOneGame(curGame.value!!.fixture.id))
         }
     }
 
@@ -90,8 +98,11 @@ class MainViewModel: ViewModel() {
         dbHelper.getBet(fixture, curBet)
     }
 
+    fun clearCurBet() {
+    }
+
     fun makeUserBet(points: Int, result: Int) {
-        dbHelper.makeUserBet(points, result, currentUser.uid, curGame.value!!.fixture.id)
+        dbHelper.makeUserBet(points, result, currentUser.uid, curGame.value!!.fixture.id, curUserBet)
     }
 
     fun removeBetListener() {
@@ -112,5 +123,17 @@ class MainViewModel: ViewModel() {
 
     fun updateUsers() {
         dbHelper.getUsers(users)
+    }
+
+    fun updateUserBet(fixture: Int) {
+        dbHelper.getUserBet(fixture, currentUser.uid, curUserBet)
+    }
+
+    fun observeUserBet(): LiveData<UserBet> {
+        return curUserBet
+    }
+
+    fun awardBet(fixture: Int) {
+        dbHelper.awardBet(fixture)
     }
 }
