@@ -6,6 +6,7 @@ import com.example.soccerbetapp.model.Bet
 import com.example.soccerbetapp.model.DBUser
 import com.example.soccerbetapp.model.UserBet
 import com.google.firebase.Firebase
+import com.google.firebase.firestore.DocumentReference
 import com.google.firebase.firestore.FieldValue
 import com.google.firebase.firestore.FirebaseFirestore
 import com.google.firebase.firestore.FirebaseFirestoreException
@@ -39,7 +40,7 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
     }
 
     fun createDBUser(uid: String, name: String, user: MutableLiveData<DBUser>) {
-        Log.d(TAG, "create")
+        Log.d(TAG, "createUser")
         val newUser = DBUser(name)
         db.collection("users").document(uid)
             .set(newUser)
@@ -147,7 +148,7 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
         }
     }
 
-    fun awardBet(fixture: Int) {
+    fun awardBet(fixture: Int, result: Int, betFinished: MutableLiveData<Boolean>) {
         val userBetsRef = db.collection("userbets")
         val userBetsQuery = userBetsRef.whereEqualTo("fixture", fixture)
         userBetsQuery.get()
@@ -158,6 +159,8 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
 
                     val betObj = betDoc.toObject(Bet::class.java)!!
                     if (betObj.finished) {
+                        betFinished.postValue(true)
+                        Log.d(TAG, "before except")
                         throw FirebaseFirestoreException("Points already rewarded", FirebaseFirestoreException.Code.ABORTED)
                     }
                     val total = betObj.homePoints + betObj.drawPoints + betObj.awayPoints
@@ -168,20 +171,31 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
                     if (betObj.drawPoints > 0) mod2 = total.toDouble() / betObj.drawPoints
                     if (betObj.awayPoints > 0) mod3 = total.toDouble() / betObj.awayPoints
 
+                    val results = mutableListOf<Long>()
+                    val userRefs = mutableListOf<DocumentReference>()
+
                     for (document in documents) {
                         val userBetObj = document.toObject(UserBet::class.java)
                         val userRef = db.collection("users").document(userBetObj.uid)
 
                         val userDoc = transaction.get(userRef)
                         val userPoints = userBetObj.points
-                        val homeResult: Long = (userPoints.toDouble() * mod1).toLong()
-                        val drawResult: Long = (userPoints.toDouble() * mod2).toLong()
-                        val awayResult: Long = (userPoints.toDouble() * mod3).toLong()
                         val bet = userBetObj.result
+                        var homeResult: Long = (userPoints.toDouble() * mod1).toLong()
+                        var drawResult: Long = (userPoints.toDouble() * mod2).toLong()
+                        var awayResult: Long = (userPoints.toDouble() * mod3).toLong()
+                        if (result != 0) homeResult = 0
+                        if (result != 1) drawResult = 0
+                        if (result != 2) awayResult = 0
 
-                        if (bet == 0) transaction.update(userRef, "total", FieldValue.increment(homeResult))
-                        else if (bet == 1) transaction.update(userRef, "total", FieldValue.increment(drawResult))
-                        else if (bet == 2) transaction.update(userRef, "total", FieldValue.increment(awayResult))
+                        if (bet == 0) results.add(homeResult)
+                        else if (bet == 1) results.add(drawResult)
+                        else if (bet == 2) results.add(awayResult)
+                        userRefs.add(userRef)
+                    }
+                    //transaction.update(userRef, "total", FieldValue.increment(drawResult))
+                    for (i in results.indices) {
+                        transaction.update(userRefs[i], "total", FieldValue.increment(results[i]))
                     }
                     transaction.update(betRef, "finished", true)
                 }
@@ -253,6 +267,7 @@ class DBHelper(private var userListener: ListenerRegistration?, private var betL
                 }
                 else {
                     Log.d(TAG, "No userbet")
+                    userBet.postValue(UserBet())
                 }
             }
             .addOnFailureListener {exception ->

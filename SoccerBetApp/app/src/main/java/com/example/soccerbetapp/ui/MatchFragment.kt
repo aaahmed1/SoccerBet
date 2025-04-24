@@ -40,7 +40,13 @@ class MatchFragment: Fragment(R.layout.fragment_match) {
             Log.d("curBet", viewModel.observeCurBet().value.toString())
             if (it.fixture.status.short == "FT" && curBet != null && !curBet.finished) {
                 Log.d("awardPoints", "Time to award points")
-                viewModel.awardBet(it.fixture.id)
+                var result: Int
+                val realHomeGoals = it.goals.home!!
+                val realAwayGoals = it.goals.away!!
+                if (realHomeGoals > realAwayGoals) result = 0
+                else if (realHomeGoals == realAwayGoals) result = 1
+                else result = 2
+                viewModel.awardBet(it.fixture.id, result)
             }
         }
         viewModel.observeDBUser().observe(viewLifecycleOwner) {
@@ -60,6 +66,13 @@ class MatchFragment: Fragment(R.layout.fragment_match) {
             binding.winHomeModifier.text = String.format("%.1f", mod1) + "x"
             binding.drawModifier.text = String.format("%.1f", mod2) + "x"
             binding.winAwayModifier.text = String.format("%.1f", mod3) + "x"
+            //Log.d("curBet", it.finished.toString())
+            if (it.finished) {
+                binding.finishedText.text = "Points have been awarded"
+            }
+            else {
+                binding.finishedText.text = "Points have not been awarded"
+            }
         }
         binding.winHomeButton.setOnClickListener {
             val user = viewModel.observeDBUser().value!!
@@ -108,12 +121,17 @@ class MatchFragment: Fragment(R.layout.fragment_match) {
             viewModel.fetchCurGame()
         }
         viewModel.observeUserBet().observe(viewLifecycleOwner) {
+            Log.d("userBet", it.toString())
             val result = it.result
             when (result) {
                 0 -> binding.yourBet.text = "You bet ${it.points} points on the home team"
                 1 -> binding.yourBet.text = "You bet ${it.points} points on a draw"
-                else -> binding.yourBet.text = "You bet ${it.points} points on the away team"
+                2 -> binding.yourBet.text = "You bet ${it.points} points on the away team"
+                else -> binding.yourBet.text = "You have not made a bet"
             }
+        }
+        viewModel.observeBetFinished().observe(viewLifecycleOwner) {
+            if (it) binding.finishedText.text = "Points have been awarded"
         }
     }
 }

@@ -23,6 +23,7 @@ class GamesRowAdapter(private val viewModel: MainViewModel, private val navContr
                     if (select == 1) games = viewModel.observeMyGames()
                     val game = games.value!![bindingAdapterPosition]
                     viewModel.setCurGame(game)
+                    viewModel.setBetFinished(false)
                     viewModel.updateCurBet(game.fixture.id)
                     viewModel.updateUserBet(game.fixture.id)
                     navController.navigate(R.id.matchFragment)

@@ -172,4 +172,10 @@
         android:id="@+id/reloadBut"
         android:text="Refresh Game"
         android:layout_margin="5dp"/>
+    <TextView
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:id="@+id/finishedText"
+        android:padding="5dp"
+        android:text="Points have not been awarded"/>
 </LinearLayout>

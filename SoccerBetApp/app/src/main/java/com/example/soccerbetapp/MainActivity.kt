@@ -53,6 +53,7 @@ class MainActivity : AppCompatActivity() {
         lifecycle.addObserver(viewModel.authUser)
         viewModel.authUser.observeUser().observe(this) {
             viewModel.currentUser = it
+            Log.d("currentUser", viewModel.currentUser.toString())
             if (viewModel.currentUser.isInvalid()) {
                 hideNavBar()
                 navController.navigate(R.id.signInFragment)

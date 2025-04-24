@@ -31,6 +31,7 @@ class MainViewModel: ViewModel() {
     private var myGames = MutableLiveData<List<GameData>>()
     private var users = MutableLiveData<List<DBUser>>()
     private var curUserBet = MutableLiveData<UserBet>()
+    private var betFinished = MutableLiveData<Boolean>()
 
     override fun onCleared() {
         super.onCleared()
@@ -133,7 +134,15 @@ class MainViewModel: ViewModel() {
         return curUserBet
     }
 
-    fun awardBet(fixture: Int) {
-        dbHelper.awardBet(fixture)
+    fun awardBet(fixture: Int, result: Int) {
+        dbHelper.awardBet(fixture, result, betFinished)
+    }
+
+    fun observeBetFinished(): LiveData<Boolean> {
+        return betFinished
+    }
+
+    fun setBetFinished(res: Boolean) {
+        betFinished.value = res
     }
 }
